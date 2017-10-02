@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright: Juda Kaleta <juda.kaleta@gmail.com>
+# Copyright: Juda Kaleta <juda.kaleta@gmail.com> and Arthur Milchior <arthur@milchior.fr>
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 #
 
@@ -11,7 +11,9 @@ TABLE_HEADER = """
         _("Deck"), _("Due"), _("New"), _("Unseen"), _("Buried"))
 
 
+"""An id, incremented for each render"""
 def renderDeckTree(self, nodes, depth=0):
+    """Html used to show the deck tree"""
     if not nodes:
         return ""
 
@@ -22,10 +24,20 @@ def renderDeckTree(self, nodes, depth=0):
 
 
 def deckRow(self, node, depth, cnt):
+    """The HTML for a single deck (and its descendant)
+    
+    Keyword arguments:
+    depth -- indentation argument (number of ancestors)
+    cnt --  TODO
+    """
     name, did, due, lrn, new, children = node
+    child_list = self.mw.col.decks.children(did)
     deck = self.mw.col.decks.get(did)
-    unseen = self.mw.col.db.scalar("select count(*) from cards where did = %i and queue=0" % did)
-    buried = self.mw.col.db.scalar("select count(*) from cards where did = %i and queue<0" % did)
+    unseen=buried =0
+    for (_, childId) in child_list:
+        #Ineficient. It should be better to save the information in the deck.  children could probably be used. But I don't know how it is composed exactly.
+        unseen += self.mw.col.db.scalar("select count(*) from cards where did = %i and queue=0" % childId)
+        buried += self.mw.col.db.scalar("select count(*) from cards where did = %i and queue<0" % childId)
     
     if did == 1 and cnt > 1 and not children:
         # if the default deck is empty, hide it
@@ -63,8 +75,8 @@ def deckRow(self, node, depth, cnt):
     def nonzeroColour(cnt, colour):
         if not cnt:
             colour = "#e0e0e0"
-        if cnt >= 1000:
-            cnt = "1000+"
+        # if cnt >= 1000:
+        #     cnt = "1000+"
         return "<font color='%s'>%s</font>" % (colour, cnt)
     buf += "<td align=right>%s</td><td align=right>%s</td><td align=right>%s</td><td align=right>%s</td>" % (
         nonzeroColour(due, "#007700"),
