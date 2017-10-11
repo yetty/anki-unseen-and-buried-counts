@@ -33,7 +33,8 @@ def deckRow(self, node, depth, cnt):
     name, did, due, lrn, new, children = node
     child_list = self.mw.col.decks.children(did)
     deck = self.mw.col.decks.get(did)
-    unseen=buried =0
+    unseen = self.mw.col.db.scalar("select count(*) from cards where did = %i and queue=0" % did)
+    buried = self.mw.col.db.scalar("select count(*) from cards where did = %i and queue<0" % did)
     for (_, childId) in child_list:
         #Ineficient. It should be better to save the information in the deck.  children could probably be used. But I don't know how it is composed exactly.
         unseen += self.mw.col.db.scalar("select count(*) from cards where did = %i and queue=0" % childId)
