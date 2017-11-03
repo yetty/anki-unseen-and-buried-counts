@@ -11,7 +11,7 @@ By default, for each deck, it shows:
 -its number of buried cards
 -the option group of the deck
 
-In order to hide one of those field, Tools>add-ons>Unseen_and_buried_counts>Edit and replace True by False in the related line.
+In order to hide one of those field, Tools>add-ons>ConfigureDeck>Edit and replace True by False in the related line.
 E.g. if you want to hide the number of due cards, search for the line:
 "new" : True ,#number of new cards
 and replace it by
